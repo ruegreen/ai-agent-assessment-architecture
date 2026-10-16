@@ -1,0 +1,50 @@
+graph TB
+    subgraph Config["Configuration — all data, schema-validated"]
+        RUBRIC["Rubric"]
+        PROFILE["Profiles (extends:)"]
+        SCEN["Scenario Suites"]
+        PERS["Personas"]
+        MISSION["Mission<br/>target + ownership + consent"]
+    end
+
+    subgraph Plan["Run Planner"]
+        FILTER["Filter by tier"]
+        EXPAND["Expand pass^k"]
+        CAP["Cost cap"]
+    end
+
+    subgraph Exec["Execution"]
+        RUNNER["Runner"]
+        SIM["Simulated User<br/>(model A)"]
+        FID["Persona Fidelity Check"]
+        ADAPT["Target Adapters"]
+    end
+
+    EV[("Evidence Store<br/>transcripts · audio · traces · end state")]
+
+    subgraph Score["Scorers"]
+        DET["deterministic"]
+        SC["state_check"]
+        JUDGE["llm_judge (model B)"]
+        AUD["audio"]
+        RT["redteam"]
+        ATT["attested"]
+    end
+
+    subgraph Agg["Aggregator"]
+        NORM["Renormalize around<br/>not_assessed / excused"]
+        GATES["Gates · caps · status floors"]
+        COV["Coverage · provisional<br/>· headline floor"]
+    end
+
+    REPORT["Scorecard<br/>HTML · JSON · PDF<br/>+ traceability matrix"]
+
+    RUBRIC --> PROFILE --> Plan
+    SCEN & PERS & MISSION --> Plan
+    Plan --> RUNNER
+    SIM <--> RUNNER <--> ADAPT
+    SIM --> FID
+    FID -->|"broke character:<br/>excluded + reported"| EV
+    RUNNER --> EV --> Score --> Agg --> REPORT
+
+---
